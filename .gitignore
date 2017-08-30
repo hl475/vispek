@@ -3,6 +3,14 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# OS generate fikes
+.DS_Store
+.DS_Store?
+
+# pandas output
+data/
+.pkl
+
 # C extensions
 *.so
 
@@ -15,7 +23,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+#lib/
 lib64/
 parts/
 sdist/
