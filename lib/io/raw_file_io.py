@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==========================================================================
-""" File IO methods.
+""" RawFile IO methods.
 """
 
 import glob
@@ -20,11 +20,13 @@ import pandas as pd
 import os
 import re
 
-class FileIO(object):
-    """ FileIO class that exoises methods to read / write to / from files.
+class RawFileIO(object):
+    """ RawFileIO class that exoises methods to read / write to / from
+    raw csv files. The output csv files will remove all header
+    information.
     """
 
-    def __init__(self, in_path, out_path, debug=True, header_info=19):
+    def __init__(self, in_path, out_path, **kwargs):
         """
         :type in_path: absolute path that contains input files
         :type out_path: absolute path that files output to
@@ -35,9 +37,8 @@ class FileIO(object):
         """
         self.in_path = in_path
         self.out_path = out_path
-        self.debug = debug 
-        self.header_info = header_info 
-
+        self.debug = kwargs.get('debug', True)
+        self.header_info = kwargs.get('header_info', None)
         self.load_data()
         self.write_data()
 
@@ -55,7 +56,15 @@ class FileIO(object):
             print('find %d csv files in path %r' %
                   (len(all_csv_files), self.in_path))
             print('Load data')
-        
+
+        with open(all_csv_files[0]) as cur_file:
+            for line_counter, cur_line in enumerate(cur_file):
+                if self.header_info is None:
+                    if cur_line.startswith('Wavelength'):
+                        self.header_info = line_counter
+                else:
+                    break
+
         for csv_file in all_csv_files:
             self.data[csv_file] = {}
             with open(csv_file) as cur_file:
@@ -64,9 +73,14 @@ class FileIO(object):
                     cur_line = next(cur_file).split(':', 1)
                     self.data[csv_file][cur_line[0]] = \
                         cur_line[1].split(',', 1)[1].split(',,')[0]
+
             # load pandas data frame
-            self.data[csv_file]['data'] = pd.read_csv(csv_file,
-                                            header=self.header_info)
+            data = pd.read_csv(csv_file, header=self.header_info)
+            if 'Unnamed: 0' in data.columns:
+                data = data.drop('Unnamed: 0', 1)
+            data.columns = [i.split(' (')[0] for i in data.columns]
+            self.data[csv_file]['data'] = data
+
     def write_data(self):
         """
         write self.data into self.out_path
@@ -77,12 +91,15 @@ class FileIO(object):
         for key, value in self.data.items():
             temp = key.split('/',-1)[-1].split('.csv')
             file_name = temp[0]
-            class_name = re.split('(\d+)', temp[0])[0]
+            
+            # FIXME: class name should read from the image
+            #class_name = re.split('(\d+)', temp[0])[0]
+            class_name = 'Apple'
+
             class_path = os.path.join(self.out_path, class_name)
             os.makedirs(class_path, exist_ok=True)
             file_name = os.path.join(class_path, file_name)
-            value['data'].to_pickle(file_name+'.pkl')
+            value['data'].to_csv(file_name+'.csv', index=False)
             lookup.add(class_name)
         if self.debug:
             print('find %d classes in %r' % (len(lookup), self.in_path))
-
