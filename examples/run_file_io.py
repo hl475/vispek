@@ -12,35 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==========================================================================
-""" Example code about how to run raw_file_io
+""" Example code about how to run file_io
 
-python3 -m vispek.examples.run_raw_file_io \
-        --in_path /Users/huaminli/Downloads/data \
-        --out_path /Users/huaminli/Desktop/vispek/data
+python3 -m vispek.examples.run_file_io \
+        --in_path /Users/huaminli/Desktop/vispek/data/Apple
 """
 
 import argparse
 
-from vispek.lib.io.raw_file_io import RawFileIO
+from vispek.lib.io.file_io import FileIO
 
 def run_file_io(args):
-    my_file_io = RawFileIO(args.in_path, args.out_path)
+    my_file_io = FileIO(args.in_path)
+    columns=['Wavelength', 'Absorbance', 'Reference Signal',
+            'Sample Signal']
+    data = my_file_io.load_data(columns=columns)
+    print('There are %d samples with size %d by %d' % \
+          (data.shape[0], data.shape[1], data.shape[2]))
 
 if __name__ == '__main__':
-                
+    
     parser = argparse.ArgumentParser(
-        description='Example code about how tun run raw_file_io')
+        description='Example code about how to run file_io')
     parser.add_argument(
         '--in_path', type=str,
-        help='absolute path to the directories that contains raw csv files')
-
-    parser.add_argument(
-        '--out_path', type=str,
-        help='absolute path to the directories that contains ' + 
-             'preproceed files')
+        help='absolute path to the directories that contains csv files')
     args = parser.parse_args()
-                                
+    
     print(args.in_path)
-    print(args.out_path)
 
     run_file_io(args)
