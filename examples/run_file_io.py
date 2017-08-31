@@ -13,11 +13,34 @@
 # limitations under the License.
 # ==========================================================================
 """ Example code about how to run file_io
+
+python3 -m vispeck.examples.run_filo_io \
+        --in_path /Users/huaminli/Downloads/data \
+        --out_path /Users/huaminli/Desktop/vispek/data
 """
+
+import argparse
 
 from vispek.lib.io.file_io import FileIO
 
-in_path = '/Users/huaminli/Downloads/0829'
-out_path = '/Users/huaminli/Desktop/vispek/data'
+def run_file_io(args):
+    my_file_io = FileIO(args.in_path, args.out_path)
 
-my_file_io = FileIO(in_path, out_path)
+if __name__ == '__main__':
+    
+    parser = argparse.ArgumentParser(
+        description='Example code about how tun run file_io')
+    parser.add_argument(
+        '--in_path', type=str,
+        help='absolute path to the directories that contains raw csv files')
+
+    parser.add_argument(
+        '--out_path', type=str,
+        help='absolute path to the directories that contains ' + 
+             'preproceed files')
+    args = parser.parse_args()
+    
+    print(args.in_path)
+    print(args.out_path)
+
+    run_file_io(args)
