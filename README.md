@@ -14,7 +14,7 @@ You need to specify in_path and out_path, e.g.,
 ```
 python3 -m vispek.examples.run_raw_file_io --in_path /Users/huaminli/Downloads/data --out_path /Users/huaminli/Desktop/vispek/data
 ```
-### how to run file_io.py
+#### how to run file_io.py
 Youn need to specify in_path, e.g.,
 ```
 python3 -m vispek.examples.run_file_io --in_path /Users/huaminli/Desktop/vispek/data/Apple/
